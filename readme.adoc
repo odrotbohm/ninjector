@@ -1,0 +1,27 @@
+= Ninjector
+
+Ninjector is the cure for a disease called Field Injection Anxiety, widely diagnosed amongst software developers that care about their code.
+The disease is caused by injection frameworks all too easily allowing http://www.martinfowler.com/articles/injection.html[dependency injection] into a class' fields which seems to be a convenient thing to do in the first place but will inevitably bite you in the back later on.
+For a more detailed analysis of symptoms and consequences, see http://olivergierke.de/2013/11/why-field-injection-is-evil[this blog post]
+
+== What does it do?
+
+```java
+@Configuration
+@ComponentScan
+@DisableFieldInjection
+class Application { … }
+
+/**
+ * This class will fail the ApplicationContext to bootstrap
+ * due to the injection annotation used on a field.
+ **/
+@Component
+class ApplicationComponent {
+
+  @Autowired MyCollaborator collaborator;
+}
+
+```
+
+`@DisableFieldInjection` registers a tiny Spring extension that will pre-process the bean instances about to be created, scan their fields for common injection annotations (e.g. `@Inject`, `@Autowired`, `@Resource`) and reject the bean instantiation right away.
